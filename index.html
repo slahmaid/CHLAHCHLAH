@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Infinite Slider + Team Carousel (Dark Mode)</title>
+    <title>Infinite Slider + Team + Form</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,13 +17,9 @@
     <style>
         /* --- GLOBAL VARIABLES --- */
         :root {
-            --c-glass: #bbbbbc;
-            --c-light: #fff;
-            --c-dark: #000;
-            --c-content: #e1e1e1;
-            --c-action: #03d5ff; /* Cyan Accent */
             --c-bg: #000000;
-            --border-radius: 25px;
+            --c-content: #e1e1e1;
+            --c-action: #03d5ff; /* Cyan Accent - THE MAIN BLUE */
             --loader-face: #ffffff;
             --loader-side: #333333;
         }
@@ -35,7 +31,6 @@
             color: var(--c-content);
             font-size: 62.5%; 
             font-family: 'DM Sans', 'Poppins', sans-serif;
-            transition: background 400ms cubic-bezier(1, 0.0, 0.4, 1), color 400ms cubic-bezier(1, 0.0, 0.4, 1);
             overflow-x: hidden;
             /* Hide default cursor so custom one shows */
             cursor: none; 
@@ -43,8 +38,10 @@
         
         body.loaded { overflow-y: auto; }
 
-        a { cursor: none; text-decoration: none; }
-        button { cursor: none; }
+        /* FORCE NO DEFAULT CURSOR ON INTERACTIVE ELEMENTS */
+        a, button, input, textarea { 
+            cursor: none; 
+        }
 
         /* --- CUSTOM CURSOR --- */
         .cursor, .cursor2, .cursor3 {
@@ -84,8 +81,8 @@
         @media screen and (max-width: 1200px){
             .cursor,.cursor2,.cursor3{ display: none; }
             body, html { cursor: auto; }
-            a { cursor: pointer; }
-            button { cursor: pointer; }
+            a, button, input, textarea { cursor: pointer; }
+            input, textarea { cursor: text; }
         }
 
         /* --- NAVIGATION / HEADER --- */
@@ -299,13 +296,6 @@
         .preloader .slice:nth-child(5) { transform: rotateZ(300deg) rotateY(90deg) rotateX(0); animation: 2s preload-cycle-5 linear infinite both; }
         .preloader .slice:nth-child(6) { transform: rotateZ(360deg) rotateY(90deg) rotateX(0); animation: 2s preload-cycle-6 linear infinite both; }
         
-        @keyframes preload-cycle-1 { 5% { transform: rotateZ(60deg) rotateY(90deg) rotateX(0deg); border-left-color: var(--loader-side); } 10%, 75% { transform: rotateZ(60deg) rotateY(0) rotateX(0deg); border-left-color: var(--loader-face); } 80%, 100% { transform: rotateZ(60deg) rotateY(90deg) rotateX(0deg); border-left-color: var(--loader-side); } }
-        @keyframes preload-cycle-2 { 10% { transform: rotateZ(120deg) rotateY(90deg) rotateX(0deg); border-left-color: var(--loader-side); } 15%, 70% { transform: rotateZ(120deg) rotateY(0) rotateX(0deg); border-left-color: var(--loader-face); } 75%, 100% { transform: rotateZ(120deg) rotateY(90deg) rotateX(0deg); border-left-color: var(--loader-side); } }
-        @keyframes preload-cycle-3 { 15% { transform: rotateZ(180deg) rotateY(90deg) rotateX(0deg); border-left-color: var(--loader-side); } 20%, 65% { transform: rotateZ(180deg) rotateY(0) rotateX(0deg); border-left-color: var(--loader-face); } 70%, 100% { transform: rotateZ(180deg) rotateY(90deg) rotateX(0deg); border-left-color: var(--loader-side); } }
-        @keyframes preload-cycle-4 { 20% { transform: rotateZ(240deg) rotateY(90deg) rotateX(0deg); border-left-color: var(--loader-side); } 25%, 60% { transform: rotateZ(240deg) rotateY(0) rotateX(0deg); border-left-color: var(--loader-face); } 65%, 100% { transform: rotateZ(240deg) rotateY(90deg) rotateX(0deg); border-left-color: var(--loader-side); } }
-        @keyframes preload-cycle-5 { 25% { transform: rotateZ(300deg) rotateY(90deg) rotateX(0deg); border-left-color: var(--loader-side); } 30%, 55% { transform: rotateZ(300deg) rotateY(0) rotateX(0deg); border-left-color: var(--loader-face); } 60%, 100% { transform: rotateZ(300deg) rotateY(90deg) rotateX(0deg); border-left-color: var(--loader-side); } }
-        @keyframes preload-cycle-6 { 30% { transform: rotateZ(360deg) rotateY(90deg) rotateX(0deg); border-left-color: var(--loader-side); } 35%, 50% { transform: rotateZ(360deg) rotateY(0) rotateX(0deg); border-left-color: var(--loader-face); } 55%, 100% { transform: rotateZ(360deg) rotateY(90deg) rotateX(0deg); border-left-color: var(--loader-side); } }
-
         /* --- MAIN SITE STYLES --- */
         section { position: relative; height: 100svh; width: 100%; background-color: var(--c-bg); overflow: hidden; }
         section.section2 { height: min-content; background-color: var(--c-bg); }
@@ -519,7 +509,7 @@
         }
         
         /* =========================================
-           NEW TEAM CAROUSEL STYLES (DARK MODE + MOBILE OPTIMIZED)
+           NEW TEAM CAROUSEL STYLES
            ========================================= */
         
         .team-section {
@@ -527,7 +517,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            background-color: #000000; /* DARK BACKGROUND */
+            background-color: #000000;
             overflow: hidden;
             scroll-behavior: smooth;
             margin: 0;
@@ -535,7 +525,7 @@
             height: 100vh; 
             width: 100%;
             font-size: 1.6rem; 
-            color: #ffffff; /* WHITE TEXT */
+            color: #ffffff; 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
         
@@ -580,7 +570,6 @@
             align-items: center;
         }
 
-        /* Desktop: Hide the arrows inside the container (they are in controls-section) */
         .carousel-container .nav-arrow {
             display: none;
         }
@@ -830,7 +819,7 @@
             }
 
             .carousel-container {
-                height: 45vh; /* Adjusted for mobile */
+                height: 45vh; 
                 max-width: 100%;
             }
 
@@ -862,7 +851,7 @@
                 bottom: 0px;
             }
 
-            /* FIXED: Set Rotation to 0deg for both to respect natural orientation */
+            /* FIXED: Set Rotation to 0deg for both */
             .carousel-container .nav-arrow.up img {
                 transform: rotate(0deg);
             }
@@ -884,7 +873,6 @@
                 width: 100%;
             }
             
-            /* Adjusted transforms for smaller mobile screens to prevent overlap */
             .card.up-2 {
                 transform: translateY(-140px) scale(0.8) translateZ(-300px);
             }
@@ -922,7 +910,178 @@
                 right: -60px;
             }
         }
-    
+
+        /* --- CONTACT FORM STYLES --- */
+        .contact-section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column; /* Allow stacking for title */
+            justify-content: center;
+            align-items: center;
+            background-color: var(--c-bg);
+            padding: 40px 20px;
+            gap: 40px; /* Space between title and form */
+        }
+
+        /* Contact Title Loader */
+        .loader {
+            max-width: fit-content;
+            color: rgb(242, 255, 240);
+            font-size: 50px;
+            font-family: 'Montserrat', sans-serif; /* Replaced 'Mine' with Montserrat */
+            position: relative;
+            font-style: italic;
+            font-weight: 600;
+        }
+        .loader span {
+            animation: cut 2s infinite;
+            transition: 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .loader:hover {
+            color: #fcffdf;
+        }
+        .loader::after {
+            position: absolute;
+            content: "";
+            width: 100%;
+            height: 6px;
+            border-radius: 4px;
+            background-color: rgba(3, 213, 255, 0.5); /* Cyan transparent */
+            top: 0px;
+            filter: blur(10px);
+            animation: scan 2s infinite;
+            left: 0;
+            z-index: 0;
+            transition: 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .loader::before {
+            position: absolute;
+            content: "";
+            width: 100%;
+            height: 5px;
+            border-radius: 4px;
+            background-color: var(--c-action); /* CYAN SOLID */
+            top: 0px;
+            animation: scan 2s infinite;
+            left: 0;
+            z-index: 1;
+            filter: opacity(0.9);
+            transition: 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes scan {
+            0% { top: 0px; }
+            25% { top: 54px; }
+            50% { top: 0px; }
+            75% { top: 54px; }
+        }
+        @keyframes cut {
+            0% { clip-path: inset(0 0 0 0); }
+            25% { clip-path: inset(100% 0 0 0); }
+            50% { clip-path: inset(0 0 100% 0); }
+            75% { clip-path: inset(0 0 0 0); }
+        }
+
+        .form-container {
+            width: 100%;
+            max-width: 400px; 
+            background: linear-gradient(#212121, #212121) padding-box,
+                        linear-gradient(145deg, transparent 35%, var(--c-action), #ffffff) border-box; /* CYAN GRADIENT */
+            border: 2px solid transparent;
+            padding: 32px 24px;
+            font-size: 14px;
+            font-family: inherit;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            box-sizing: border-box;
+            border-radius: 16px;
+            z-index: 10;
+        }
+
+        .form-container button:active {
+            scale: 0.95;
+        }
+
+        .form-container .form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-container .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .form-container .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #717171;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .form-container .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: #fff;
+            font-family: inherit;
+            background-color: transparent;
+            border: 1px solid #414141;
+        }
+
+        .form-container .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 8px;
+            resize: none;
+            color: #fff;
+            height: 96px;
+            border: 1px solid #414141;
+            background-color: transparent;
+            font-family: inherit;
+        }
+
+        .form-container .form-group input::placeholder {
+            opacity: 0.5;
+        }
+
+        .form-container .form-group input:focus {
+            outline: none;
+            border-color: var(--c-action); /* CYAN BORDER FOCUS */
+        }
+
+        .form-container .form-group textarea:focus {
+            outline: none;
+            border-color: var(--c-action); /* CYAN BORDER FOCUS */
+        }
+
+        .form-container .form-submit-btn {
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            align-self: flex-start;
+            font-family: inherit;
+            color: #717171;
+            font-weight: 600;
+            width: 40%;
+            background: #313131;
+            border: 1px solid #414141;
+            padding: 12px 16px;
+            font-size: inherit;
+            gap: 8px;
+            margin-top: 8px;
+            cursor: none !important; 
+            border-radius: 6px;
+        }
+
+        .form-container .form-submit-btn:hover {
+            background-color: #fff;
+            border-color: #fff;
+        }
     </style>
 </head>
 <body>
@@ -1054,6 +1213,24 @@
                     <div class="dot hover-target" data-index="5"></div>
                 </div>
             </div>
+        </div>
+    </section>
+
+    <section class="contact-section">
+        <p class="loader hover-target"><span>Contact</span></p>
+        
+        <div class="form-container">
+          <form class="form">
+            <div class="form-group">
+              <label for="email">Company Email</label>
+              <input type="text" id="email" name="email" required="" class="hover-target">
+            </div>
+            <div class="form-group">
+              <label for="textarea">How Can We Help You?</label>
+              <textarea name="textarea" id="textarea" rows="10" cols="50" required="" class="hover-target">          </textarea>
+            </div>
+            <button class="form-submit-btn hover-target" type="submit">Submit</button>
+          </form>
         </div>
     </section>
 
