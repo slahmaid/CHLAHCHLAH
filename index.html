@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Infinite Slider + Menu & Cursor</title>
+    <title>Infinite Slider + Team Carousel (Dark Mode)</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,9 +23,6 @@
             --c-content: #e1e1e1;
             --c-action: #03d5ff; /* Cyan Accent */
             --c-bg: #000000;
-            --glass-reflex-dark: 2;
-            --glass-reflex-light: 0.3;
-            --saturation: 150%;
             --border-radius: 25px;
             --loader-face: #ffffff;
             --loader-side: #333333;
@@ -47,6 +44,7 @@
         body.loaded { overflow-y: auto; }
 
         a { cursor: none; text-decoration: none; }
+        button { cursor: none; }
 
         /* --- CUSTOM CURSOR --- */
         .cursor, .cursor2, .cursor3 {
@@ -56,7 +54,7 @@
             pointer-events: none;
             left: -100px;
             top: 50%;
-            mix-blend-mode: difference; /* Cool effect on images */
+            mix-blend-mode: difference; 
             transition: all 300ms linear;
         }
         .cursor {
@@ -87,6 +85,7 @@
             .cursor,.cursor2,.cursor3{ display: none; }
             body, html { cursor: auto; }
             a { cursor: pointer; }
+            button { cursor: pointer; }
         }
 
         /* --- NAVIGATION / HEADER --- */
@@ -95,7 +94,7 @@
             width: 100%;
             top: 0;
             left: 0;
-            z-index: 9990; /* High z-index */
+            z-index: 9990;
             padding: 20px;
         }
         .header-wrapper {
@@ -135,7 +134,7 @@
             width: 30px;
             position: relative;
             z-index: 2;
-            cursor: none; /* Use custom cursor */
+            cursor: none; 
             display: block;
         }
         .menu-icon__line {
@@ -171,11 +170,11 @@
             transform: translateX(100%) translateY(-100%);
         }
         .nav:after {
-            background: rgba(0,0,0,1); /* Pure black for the top layer */
+            background: rgba(0,0,0,1); 
             transition-delay: 0s;
         }
         .nav:before {
-            background: var(--c-action); /* The accent color peek-a-boo */
+            background: var(--c-action);
             transition-delay: .2s;
         }
         .nav__content {
@@ -257,7 +256,7 @@
         body.nav-active .nav__list-item:nth-child(3) { transition-delay: 0.9s; }
         body.nav-active .nav__list-item:nth-child(4) { transition-delay: 1s; }
 
-        /* --- PRELOADER (Existing) --- */
+        /* --- PRELOADER --- */
         #preloader-overlay {
             position: fixed;
             top: 0;
@@ -265,7 +264,7 @@
             width: 100%;
             height: 100%;
             background: #000;
-            z-index: 999999; /* Highest priority */
+            z-index: 999999; 
             display: flex;
             justify-content: center;
             align-items: center;
@@ -311,9 +310,9 @@
         section { position: relative; height: 100svh; width: 100%; background-color: var(--c-bg); overflow: hidden; }
         section.section2 { height: min-content; background-color: var(--c-bg); }
         .loop-images { display: flex; align-items: center; justify-content: center; flex-direction: column; }
-        .carousel-track { --w: 30rem; --total: 12; --left: calc(var(--w) * -1); width: 100%; height: 30rem; position: relative; }
+        .carousel-track-orig { --w: 30rem; --total: 12; --left: calc(var(--w) * -1); width: 100%; height: 30rem; position: relative; }
         
-        .carousel-track .carousel-item {
+        .carousel-track-orig .carousel-item {
             position: absolute;
             width: var(--w);
             height: var(--w);
@@ -329,8 +328,7 @@
             z-index: 1;
         }
         
-        /* Add hover-target logic to images */
-        .carousel-track .carousel-item img {
+        .carousel-track-orig .carousel-item img {
             width: 100%;
             height: 100%;
             object-fit: cover;
@@ -341,7 +339,7 @@
             -webkit-mask: linear-gradient(to bottom, rgba(0,0,0,1) 70%, transparent 100%);
         }
         
-        .carousel-track .carousel-item:hover img { transform: rotateY(0deg) translateY(-1rem); z-index: 10; }
+        .carousel-track-orig .carousel-item:hover img { transform: rotateY(0deg) translateY(-1rem); z-index: 10; }
         @keyframes scroll-left { to { left: var(--left); } }
         
         .scroll-down {
@@ -352,51 +350,16 @@
         .image-motion { width: 100%; height: 100%; border-radius: inherit; object-position: center; transform: rotateX(90deg); transform-origin: 50% 0; }
         .image-motion picture { display: block; width: 100%; height: 100%; }
         .image-motion picture img { width: 100%; height: 100%; object-fit: cover; }
-        
-        .section3 { display: flex; justify-content: center; align-items: center; color: var(--c-content); padding: 6rem 2rem; min-height: 100vh; background: var(--c-bg); overflow: hidden; }
-        .section3 .container { width: 100%; max-width: 1200px; margin: auto; text-align: center; position: relative; z-index: 2; }
-        .section3 .title { font-size: 5rem; font-weight: 800; margin-bottom: 2.5rem; background: linear-gradient(135deg, var(--c-action) 0%, var(--c-content) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.1; letter-spacing: -2px; position: relative; }
-        .section3 .subtitle { font-size: 1.6rem; font-weight: 300; color: color-mix(in srgb, var(--c-content), transparent 30%); margin-bottom: 2rem; letter-spacing: 3px; text-transform: uppercase; }
-        .section3 .text-content .text { font-size: 1.3rem; font-weight: 400; color: var(--c-content); line-height: 1.9; margin-bottom: 2.5rem; max-width: 700px; margin-inline: auto; }
-        .section3 .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2.5rem; margin-top: 5rem; }
-        .section3 .feature { background: color-mix(in srgb, var(--c-glass) 10%, transparent); backdrop-filter: blur(10px); border: 1px solid color-mix(in srgb, var(--c-content) 20%, transparent); border-radius: var(--border-radius); padding: 3.5rem 2.5rem; text-align: center; transition: all 0.4s ease; }
-        .section3 .feature:hover { transform: translateY(-15px); border-color: var(--c-action); }
-        .section3 .feature h3 { font-size: 1.8rem; font-weight: 700; color: var(--c-content); margin-bottom: 1.5rem; }
-        .section3 .feature p { font-size: 1.1rem; font-weight: 300; color: color-mix(in srgb, var(--c-content), transparent 40%); line-height: 1.7; }
-        @media (max-width: 768px) { .section3 { padding: 4rem 1rem; margin-top: -2px; } .section3 .title { font-size: 3.5rem; } .section3 .features { grid-template-columns: 1fr; } }
 
         /* --- MOBILE SPECIFIC FIX FOR HEADER --- */
         @media (max-width: 768px) {
-            .cd-header {
-                padding: 20px 20px; /* Keep standard padding */
-            }
-            .header-wrapper {
-                /* Reset width calculation and margin used for desktop */
-                width: 100%;
-                margin-left: 0;
-            }
-            .logo-wrap {
-                /* Ensure it sticks to the left of the container */
-                left: 0;
-            }
+            .cd-header { padding: 20px 20px; }
+            .header-wrapper { width: 100%; margin-left: 0; }
+            .logo-wrap { left: 0; }
         }
     
         /* --- SCROLL ANIMATION STYLES --- */
         @import url(https://fonts.googleapis.com/css?family=Cabin);
-
-        .scroll-down {
-            position: absolute;
-            bottom: 5rem;
-            left: 0;
-            right: 0;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-decoration: none;
-            opacity: 1;
-            z-index: 5;
-        }
 
         .mouse {
             position: relative;
@@ -554,6 +517,411 @@
             mix-blend-mode: screen;
             filter: blur(80px);
         }
+        
+        /* =========================================
+           NEW TEAM CAROUSEL STYLES (DARK MODE + MOBILE OPTIMIZED)
+           ========================================= */
+        
+        .team-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #000000; /* DARK BACKGROUND */
+            overflow: hidden;
+            scroll-behavior: smooth;
+            margin: 0;
+            padding: 20px 0;
+            height: 100vh; 
+            width: 100%;
+            font-size: 1.6rem; 
+            color: #ffffff; /* WHITE TEXT */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+        
+        .team-section a { cursor: none; }
+        .team-section button { cursor: none; }
+
+        .main-container {
+            display: flex;
+            width: 100%;
+            max-width: 1200px;
+            height: 80vh;
+            gap: 60px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .carousel-section {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .controls-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+            padding-left: 40px;
+        }
+
+        .carousel-container {
+            width: 100%;
+            max-width: 500px;
+            height: 70vh;
+            position: relative;
+            perspective: 1000px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Desktop: Hide the arrows inside the container (they are in controls-section) */
+        .carousel-container .nav-arrow {
+            display: none;
+        }
+
+        .carousel-track {
+            width: 450px;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .card {
+            position: absolute;
+            width: 400px;
+            height: 225px;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(255, 255, 255, 0.08); 
+            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            cursor: none !important;
+        }
+
+        .card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            background-color: #fff;
+            mask: none;
+            -webkit-mask: none;
+            transform: none;
+        }
+
+        .card.center {
+            z-index: 10;
+            transform: scale(1.1) translateZ(0);
+        }
+
+        .card.center img {
+            filter: none;
+        }
+
+        .card.up-2 {
+            z-index: 1;
+            transform: translateY(-300px) scale(0.8) translateZ(-300px);
+            opacity: 0.7;
+        }
+
+        .card.up-2 img {
+            filter: grayscale(100%);
+        }
+
+        .card.up-1 {
+            z-index: 5;
+            transform: translateY(-150px) scale(0.9) translateZ(-100px);
+            opacity: 0.9;
+        }
+
+        .card.up-1 img {
+            filter: grayscale(100%);
+        }
+
+        .card.down-1 {
+            z-index: 5;
+            transform: translateY(150px) scale(0.9) translateZ(-100px);
+            opacity: 0.9;
+        }
+
+        .card.down-1 img {
+            filter: grayscale(100%);
+        }
+
+        .card.down-2 {
+            z-index: 1;
+            transform: translateY(300px) scale(0.8) translateZ(-300px);
+            opacity: 0.7;
+        }
+
+        .card.down-2 img {
+            filter: grayscale(100%);
+        }
+
+        .card.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .member-info {
+            text-align: center;
+            margin-top: 20px;
+            transition: all 0.5s ease-out;
+        }
+
+        .member-name {
+            color: #ffffff;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .member-name::before,
+        .member-name::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            width: 80px;
+            height: 2px;
+            background: #ffffff;
+        }
+
+        .member-name::before {
+            left: -100px;
+        }
+
+        .member-name::after {
+            right: -100px;
+        }
+
+        .member-role {
+            color: #a0a0a0;
+            font-size: 1.2rem;
+            font-weight: 500;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 5px 0;
+            margin-top: -10px;
+            position: relative;
+        }
+        .dots {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 30px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            cursor: none !important;
+            transition: all 0.3s ease;
+        }
+
+        .dot.active {
+            background: #ffffff;
+            transform: scale(1.2);
+        }
+
+        .nav-arrow {
+            position: relative;
+            background: transparent;
+            color: white;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: none !important; 
+            z-index: 20;
+            transition: all 0.3s ease;
+            font-size: 1.5rem;
+            border: none;
+            outline: none;
+            margin: 0;
+            padding: 0;
+            overflow: visible;
+            box-shadow: none;
+        }
+
+        .nav-arrow:hover {
+            background: transparent;
+            transform: scale(1.2);
+            box-shadow: none;
+            border-color: transparent;
+        }
+
+        .nav-arrow img {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            filter: invert(1); /* Invert black icons to white */
+            transition: all 0.3s ease;
+            mask: none;
+            -webkit-mask: none;
+            background-color: transparent;
+            transform: none;
+        }
+
+        .nav-arrow:hover img {
+            filter: invert(1);
+            transform: scale(1.1);
+            z-index: auto;
+        }
+
+        .nav-arrow.up {
+            transform: none;
+        }
+
+        .nav-arrow.down {
+            transform: none;
+        }
+
+        .nav-controls {
+            display: flex;
+            flex-direction: row;
+            gap: 30px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* --- MOBILE BREAKPOINT --- */
+        @media (max-width: 768px) {
+            .team-section {
+                padding: 20px 0;
+                height: auto;
+                min-height: 100svh;
+            }
+
+            .main-container {
+                flex-direction: column;
+                height: auto;
+                gap: 10px;
+                max-width: 100%;
+            }
+
+            .carousel-section {
+                flex: none;
+                width: 100%;
+            }
+
+            .controls-section {
+                flex: none;
+                width: 100%;
+                padding-left: 0;
+                gap: 20px;
+            }
+
+            .carousel-container {
+                height: 45vh; /* Adjusted for mobile */
+                max-width: 100%;
+            }
+
+            /* Force display flex on mobile arrows */
+            .carousel-container .nav-arrow {
+                display: flex;
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 50px;
+                height: 50px;
+                margin: 0;
+                background: transparent;
+                border: none;
+                box-shadow: none;
+                z-index: 50;
+            }
+
+            .carousel-container .nav-arrow img {
+                width: 30px;
+                height: 30px;
+            }
+
+            .carousel-container .nav-arrow.up {
+                top: 0px;
+            }
+
+            .carousel-container .nav-arrow.down {
+                bottom: 0px;
+            }
+
+            /* FIXED: Set Rotation to 0deg for both to respect natural orientation */
+            .carousel-container .nav-arrow.up img {
+                transform: rotate(0deg);
+            }
+
+            .carousel-container .nav-arrow.down img {
+                transform: rotate(0deg);
+            }
+
+            .nav-controls {
+                display: none;
+            }
+
+            .card {
+                width: 280px;
+                height: 158px;
+            }
+
+            .carousel-track {
+                width: 100%;
+            }
+            
+            /* Adjusted transforms for smaller mobile screens to prevent overlap */
+            .card.up-2 {
+                transform: translateY(-140px) scale(0.8) translateZ(-300px);
+            }
+
+            .card.up-1 {
+                transform: translateY(-70px) scale(0.9) translateZ(-100px);
+            }
+
+            .card.down-1 {
+                transform: translateY(70px) scale(0.9) translateZ(-100px);
+            }
+
+            .card.down-2 {
+                transform: translateY(140px) scale(0.8) translateZ(-300px);
+            }
+
+            .member-name {
+                font-size: 1.8rem;
+            }
+
+            .member-role {
+                font-size: 1rem;
+            }
+
+            .member-name::before,
+            .member-name::after {
+                width: 40px;
+            }
+
+            .member-name::before {
+                left: -60px;
+            }
+
+            .member-name::after {
+                right: -60px;
+            }
+        }
     
     </style>
 </head>
@@ -601,7 +969,7 @@
     </div>
 
     <section class="loop-images">
-        <div class="carousel-track" style="--time: 60s;">
+        <div class="carousel-track-orig" style="--time: 60s;">
             <div class="carousel-item hover-target" style="--i: 1;"><img src="https://placehold.co/600x600/EEE/31343C?text=Image+1" alt="Product 1"></div>
             <div class="carousel-item hover-target" style="--i: 2;"><img src="https://placehold.co/600x600/EEE/31343C?text=Image+2" alt="Product 2"></div>
             <div class="carousel-item hover-target" style="--i: 3;"><img src="https://placehold.co/600x600/EEE/31343C?text=Image+3" alt="Product 3"></div>
@@ -629,27 +997,61 @@
         </div>
     </section>
 
-    <section class="section3">
-        <div class="container">
-            <h1 class="title">YOUR MAIN TITLE</h1>
-            <p class="subtitle">Your Subtitle Here</p>
-            <div class="text-content">
-                <p class="text">Write your first paragraph here. This text will split and animate when you scroll into view.</p>
-                <p class="text">Write your second paragraph here regarding your product, service, or portfolio details.</p>
-                <p class="text">Final concluding paragraph describing the project or offer.</p>
+    <section class="team-section">
+        <div class="main-container">
+            <div class="carousel-section">
+                <div class="carousel-container">
+                    <button class="nav-arrow up hover-target">
+                        <img src="https://ik.imagekit.io/gopichakradhar/icons/top.png?updatedAt=1754290522765" alt="Up">
+                    </button>
+                    <div class="carousel-track">
+                        <div class="card hover-target" data-index="0">
+                            <img src="https://ik.imagekit.io/gopichakradhar/luffy/o1.jpeg?updatedAt=1754289569411" alt="Team Member 1">
+                        </div>
+                        <div class="card hover-target" data-index="1">
+                            <img src="https://ik.imagekit.io/gopichakradhar/luffy/o2.jpeg?updatedAt=1754289569307" alt="Team Member 2">
+                        </div>
+                        <div class="card hover-target" data-index="2">
+                            <img src="https://ik.imagekit.io/gopichakradhar/luffy/o4.jpeg?updatedAt=1754289569398" alt="Team Member 3">
+                        </div>
+                        <div class="card hover-target" data-index="3">
+                            <img src="https://ik.imagekit.io/gopichakradhar/luffy/o3.jpeg?updatedAt=1754289569422" alt="Team Member 4">
+                        </div>
+                        <div class="card hover-target" data-index="4">
+                            <img src="https://ik.imagekit.io/gopichakradhar/luffy/o5.jpeg?updatedAt=1754289569406" alt="Team Member 5">
+                        </div>
+                        <div class="card hover-target" data-index="5">
+                            <img src="https://ik.imagekit.io/gopichakradhar/luffy/o6.jpeg?updatedAt=1754289569438" alt="Team Member 6">
+                        </div>
+                    </div>
+                    <button class="nav-arrow down hover-target">
+                        <img src="https://ik.imagekit.io/gopichakradhar/icons/down.png?updatedAt=1754290523249" alt="Down">
+                    </button>
+                </div>
             </div>
-            <div class="features">
-                <div class="feature hover-target">
-                    <h3>Feature One</h3>
-                    <p>Description of feature one goes here.</p>
+    
+            <div class="controls-section">
+                <div class="nav-controls">
+                    <button class="nav-arrow up hover-target">
+                        <img src="https://ik.imagekit.io/gopichakradhar/icons/top.png?updatedAt=1754290522765" alt="Up">
+                    </button>
+                    <button class="nav-arrow down hover-target">
+                        <img src="https://ik.imagekit.io/gopichakradhar/icons/down.png?updatedAt=1754290523249" alt="Down">
+                    </button>
                 </div>
-                <div class="feature hover-target">
-                    <h3>Feature Two</h3>
-                    <p>Description of feature two goes here.</p>
+    
+                <div class="member-info">
+                    <h2 class="member-name">Emily Kim</h2>
+                    <p class="member-role">Founder</p>
                 </div>
-                <div class="feature hover-target">
-                    <h3>Feature Three</h3>
-                    <p>Description of feature three goes here.</p>
+    
+                <div class="dots">
+                    <div class="dot active hover-target" data-index="0"></div>
+                    <div class="dot hover-target" data-index="1"></div>
+                    <div class="dot hover-target" data-index="2"></div>
+                    <div class="dot hover-target" data-index="3"></div>
+                    <div class="dot hover-target" data-index="4"></div>
+                    <div class="dot hover-target" data-index="5"></div>
                 </div>
             </div>
         </div>
@@ -660,6 +1062,7 @@
             setTimeout(() => {
                 document.body.classList.add("loaded");
                 initAnimations();
+                initTeamCarousel(); // Initialize the new carousel logic
             }, 1000);
         });
 
@@ -676,14 +1079,6 @@
                 transform: 'rotateX(0deg)',
                 scrollTrigger: { trigger: '.section2', start: 'top bottom', end: 'bottom top', scrub: true, markers: false },
             });
-
-            gsap.fromTo('.title', { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 1, ease: 'power3.out', scrollTrigger: { trigger: '.section3', start: 'top 80%', end: 'bottom 20%', toggleActions: 'play none none reverse' } });
-            gsap.fromTo('.subtitle', { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8, delay: 0.3, ease: 'power3.out', scrollTrigger: { trigger: '.section3', start: 'top 80%', end: 'bottom 20%', toggleActions: 'play none none reverse' } });
-
-            // Simplified text animation (Removed SplitText dependency)
-            gsap.fromTo('.text', { opacity: 0, y: 30 }, { opacity: 1, y: 0, stagger: 0.2, duration: 0.8, ease: 'power3.out', scrollTrigger: { trigger: '.text-content', start: 'top 80%', end: 'bottom 20%', toggleActions: 'play none none reverse' } });
-
-            gsap.fromTo('.feature', { opacity: 0, y: 50, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, stagger: 0.2, duration: 0.8, ease: 'power3.out', scrollTrigger: { trigger: '.features', start: 'top 80%', end: 'bottom 20%', toggleActions: 'play none none reverse' } });
 
             // 2. MOUSE POINTER LOGIC (Vanilla JS)
             const t = document.getElementById("cursor"),
@@ -726,6 +1121,142 @@
                     body.classList.toggle('nav-active');
                 });
             }
+        }
+
+        // --- TEAM CAROUSEL LOGIC ---
+        function initTeamCarousel() {
+            const teamMembers = [
+                { name: "Luffy", role: "Founder" },
+                { name: "Monkey D. Luffy", role: "Creative Director" },
+                { name: "Luffy chan", role: "Lead Developer" },
+                { name: "Lucy", role: "UX Designer" },
+                { name: "Luffy kun", role: "Marketing Manager" },
+                { name: "Monkey chan", role: "Product Manager" }
+            ];
+
+            const cards = document.querySelectorAll(".card");
+            const dots = document.querySelectorAll(".dot");
+            const memberName = document.querySelector(".member-name");
+            const memberRole = document.querySelector(".member-role");
+            const upArrows = document.querySelectorAll(".nav-arrow.up");
+            const downArrows = document.querySelectorAll(".nav-arrow.down");
+            let currentIndex = 0;
+            let isAnimating = false;
+
+            function updateCarousel(newIndex) {
+                if (isAnimating) return;
+                isAnimating = true;
+
+                currentIndex = (newIndex + cards.length) % cards.length;
+
+                cards.forEach((card, i) => {
+                    const offset = (i - currentIndex + cards.length) % cards.length;
+
+                    card.classList.remove(
+                        "center",
+                        "up-1",
+                        "up-2",
+                        "down-1",
+                        "down-2",
+                        "hidden"
+                    );
+
+                    if (offset === 0) {
+                        card.classList.add("center");
+                    } else if (offset === 1) {
+                        card.classList.add("down-1");
+                    } else if (offset === 2) {
+                        card.classList.add("down-2");
+                    } else if (offset === cards.length - 1) {
+                        card.classList.add("up-1");
+                    } else if (offset === cards.length - 2) {
+                        card.classList.add("up-2");
+                    } else {
+                        card.classList.add("hidden");
+                    }
+                });
+
+                dots.forEach((dot, i) => {
+                    dot.classList.toggle("active", i === currentIndex);
+                });
+
+                memberName.style.opacity = "0";
+                memberRole.style.opacity = "0";
+
+                setTimeout(() => {
+                    memberName.textContent = teamMembers[currentIndex].name;
+                    memberRole.textContent = teamMembers[currentIndex].role;
+                    memberName.style.opacity = "1";
+                    memberRole.style.opacity = "1";
+                }, 300);
+
+                setTimeout(() => {
+                    isAnimating = false;
+                }, 800);
+            }
+
+            upArrows.forEach(arrow => {
+                arrow.addEventListener("click", () => {
+                    updateCarousel(currentIndex - 1);
+                });
+            });
+
+            downArrows.forEach(arrow => {
+                arrow.addEventListener("click", () => {
+                    updateCarousel(currentIndex + 1);
+                });
+            });
+
+            dots.forEach((dot, i) => {
+                dot.addEventListener("click", () => {
+                    updateCarousel(i);
+                });
+            });
+
+            cards.forEach((card, i) => {
+                card.addEventListener("click", () => {
+                    updateCarousel(i);
+                });
+            });
+
+            document.addEventListener("keydown", (e) => {
+                if (e.key === "ArrowUp") {
+                    updateCarousel(currentIndex - 1);
+                } else if (e.key === "ArrowDown") {
+                    updateCarousel(currentIndex + 1);
+                }
+            });
+
+            let touchStartX = 0;
+            let touchEndX = 0;
+
+            const teamSection = document.querySelector('.team-section');
+            
+            if(teamSection) {
+                teamSection.addEventListener("touchstart", (e) => {
+                    touchStartX = e.changedTouches[0].screenY;
+                });
+
+                teamSection.addEventListener("touchend", (e) => {
+                    touchEndX = e.changedTouches[0].screenY;
+                    handleSwipe();
+                });
+            }
+
+            function handleSwipe() {
+                const swipeThreshold = 50;
+                const diff = touchStartX - touchEndX;
+
+                if (Math.abs(diff) > swipeThreshold) {
+                    if (diff > 0) {
+                        updateCarousel(currentIndex + 1);
+                    } else {
+                        updateCarousel(currentIndex - 1);
+                    }
+                }
+            }
+
+            updateCarousel(0);
         }
     </script>
 </body>
