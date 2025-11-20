@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infinite Slider + Menu & Cursor</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:100,100i,200,200i,300,300i,400,400i,500,500i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,100..1000&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+    <script src="https://assets.codepen.io/16327/SplitText3.min.js"></script> 
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
+
+    <style>
+        /* --- GLOBAL VARIABLES --- */
+        :root {
+            --c-glass: #bbbbbc;
+            --c-light: #fff;
+            --c-dark: #000;
+            --c-content: #e1e1e1;
+            --c-action: #03d5ff; /* Cyan Accent */
+            --c-bg: #000000;
+            --glass-reflex-dark: 2;
+            --glass-reflex-light: 0.3;
+            --saturation: 150%;
+            --border-radius: 25px;
+            --loader-face: #ffffff;
+            --loader-side: #333333;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body, html {
+            background-color: var(--c-bg);
+            color: var(--c-content);
+            font-size: 62.5%; 
+            font-family: 'DM Sans', 'Poppins', sans-serif;
+            transition: background 400ms cubic-bezier(1, 0.0, 0.4, 1), color 400ms cubic-bezier(1, 0.0, 0.4, 1);
+            overflow-x: hidden;
+            /* Hide default cursor so custom one shows */
+            cursor: none; 
+        }
+        
+        body.loaded { overflow-y: auto; }
+
+        a { cursor: none; text-decoration: none; }
+
+        /* --- CUSTOM CURSOR --- */
+        .cursor, .cursor2, .cursor3 {
+            position: fixed;
+            border-radius: 50%; 
+            transform: translateX(-50%) translateY(-50%);
+            pointer-events: none;
+            left: -100px;
+            top: 50%;
+            mix-blend-mode: difference; /* Cool effect on images */
+            transition: all 300ms linear;
+        }
+        .cursor {
+            background-color: #fff;
+            height: 0;
+            width: 0;
+            z-index: 99999;
+        }
+        .cursor2, .cursor3 {
+            height: 36px;
+            width: 36px;
+            z-index: 99998;
+            transition: all 0.3s ease-out;
+        }
+        .cursor2.hover, .cursor3.hover {
+            transform: scale(2) translateX(-25%) translateY(-25%);
+            border: none;
+        }
+        .cursor2 {
+            border: 2px solid #fff;
+            box-shadow: 0 0 22px rgba(255, 255, 255, 0.6);
+        }
+        .cursor2.hover {
+            background: rgba(255,255,255,1);
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.2);
+        }
+        @media screen and (max-width: 1200px){
+            .cursor,.cursor2,.cursor3{ display: none; }
+            body, html { cursor: auto; }
+            a { cursor: pointer; }
+        }
+
+        /* --- NAVIGATION / HEADER --- */
+        .cd-header {
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 9990; /* High z-index */
+            padding: 20px;
+        }
+        .header-wrapper {
+            position: relative;
+            width: calc(100% - 100px);
+            margin-left: 50px;
+        }
+        .logo-wrap {
+            position: absolute;
+            display: block;
+            left: 0;
+            top: 15px;
+        }
+        .logo-wrap a {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #fff;
+            transition: all 0.3s ease-out;
+        }
+        .logo-wrap a span { color: var(--c-action); }
+        .logo-wrap a:hover { opacity: 0.9; }
+
+        .nav-but-wrap {
+            position: relative;
+            display: inline-block;
+            float: right;
+            padding-left: 15px;
+            padding-top: 15px;
+            margin-top: 6px;
+            transition: all 0.3s ease-out;
+        }
+        .menu-icon {
+            height: 30px;
+            width: 30px;
+            position: relative;
+            z-index: 2;
+            cursor: none; /* Use custom cursor */
+            display: block;
+        }
+        .menu-icon__line {
+            height: 2px;
+            width: 30px;
+            display: block;
+            background-color: #fff;
+            margin-bottom: 7px;
+            transition: transform .2s ease, background-color .5s ease;
+        }
+        .menu-icon__line-left { width: 16.5px; transition: all 200ms linear; }
+        .menu-icon__line-right { width: 16.5px; float: right; transition: all 200ms linear; }
+        
+        .menu-icon:hover .menu-icon__line-left,
+        .menu-icon:hover .menu-icon__line-right { width: 30px; }
+
+        /* --- OVERLAY MENU --- */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 9980;
+        }
+        .nav:before, .nav:after {
+            content: "";
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(20, 21, 26, 0.9);
+            border-bottom-left-radius: 200%;
+            z-index: -1;
+            transition: transform cubic-bezier(0.77, 0, 0.175, 1) 0.6s, border-radius linear 0.8s;
+            transform: translateX(100%) translateY(-100%);
+        }
+        .nav:after {
+            background: rgba(0,0,0,1); /* Pure black for the top layer */
+            transition-delay: 0s;
+        }
+        .nav:before {
+            background: var(--c-action); /* The accent color peek-a-boo */
+            transition-delay: .2s;
+        }
+        .nav__content {
+            position: fixed;
+            visibility: hidden;
+            top: 50%;
+            left: 0;
+            transform: translate(0%, -50%);
+            width: 100%;
+            text-align: center;
+        }
+        .nav__list {
+            position: relative;
+            padding: 0;
+            margin: 0;
+            z-index: 2;
+            list-style: none;
+        }
+        .nav__list-item {
+            position: relative;
+            display: block;
+            transition-delay: 0.8s;
+            opacity: 0;
+            text-align: center;
+            color: #fff;
+            overflow: hidden; 
+            font-family: 'Montserrat', sans-serif;
+            font-size: 8vh;
+            font-weight: 900;
+            line-height: 1.15;
+            letter-spacing: 3px;
+            transform: translate(100px, 0%);
+            transition: opacity .2s ease, transform .3s ease;
+        }
+        .nav__list-item a { 
+            position: relative;
+            text-decoration: none;
+            color: rgba(255,255,255,0.6);
+            overflow: hidden; 
+            padding: 0 5px;
+            font-weight: 900;
+            z-index: 2;
+            display: inline-block;
+            text-transform: uppercase;
+            transition: all 200ms linear; 
+        }
+        .nav__list-item a:after { 
+            position: absolute;
+            content: '';
+            top: 50%;
+            margin-top: -2px;
+            left: 50%;
+            width: 0;
+            height: 0;
+            opacity: 0;
+            background-color: var(--c-action);
+            z-index: 1;
+            transition: all 200ms linear; 
+        }
+        .nav__list-item a:hover:after { height: 4px; opacity: 1; left: 0; width: 100%; }
+        .nav__list-item a:hover { color: rgba(255,255,255,1); }
+        
+        /* Nav Active States */
+        body.nav-active .nav__content { visibility: visible; }
+        body.nav-active .menu-icon__line { background-color: #fff; transform: translate(0px, 0px) rotate(-45deg); }
+        body.nav-active .menu-icon__line-left { width: 15px; transform: translate(2px, 4px) rotate(45deg); }
+        body.nav-active .menu-icon__line-right { width: 15px; float: right; transform: translate(-3px, -3.5px) rotate(45deg); }
+        body.nav-active .menu-icon:hover .menu-icon__line-left,
+        body.nav-active .menu-icon:hover .menu-icon__line-right { width: 15px; }
+        body.nav-active .nav { visibility: visible; }
+        body.nav-active .nav:before, body.nav-active .nav:after { transform: translateX(0%) translateY(0%); border-radius: 0; }
+        body.nav-active .nav:after { transition-delay: .1s; }
+        body.nav-active .nav:before { transition-delay: 0s; }
+        body.nav-active .nav__list-item { opacity: 1; transform: translateX(0%); transition: opacity .3s ease, transform .3s ease, color .3s ease; }
+        
+        /* Staggered Animation Delay */
+        body.nav-active .nav__list-item:nth-child(1) { transition-delay: 0.7s; }
+        body.nav-active .nav__list-item:nth-child(2) { transition-delay: 0.8s; }
+        body.nav-active .nav__list-item:nth-child(3) { transition-delay: 0.9s; }
+        body.nav-active .nav__list-item:nth-child(4) { transition-delay: 1s; }
+
+        /* --- PRELOADER (Existing) --- */
+        #preloader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 999999; /* Highest priority */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        body.loaded #preloader-overlay { opacity: 0; visibility: hidden; pointer-events: none; }
+        .preloader {
+            font-size: 20px;
+            display: block;
+            width: 3.75em;
+            height: 4.25em;
+            transform-origin: center center;
+            transform: rotateY(180deg) rotateZ(-60deg);
+        }
+        .preloader .slice {
+            border-top: 1.125em solid transparent;
+            border-right: none;
+            border-bottom: 1em solid transparent;
+            border-left: 1.875em solid var(--loader-face);
+            position: absolute;
+            top: 0px;
+            left: 50%;
+            transform-origin: left bottom;
+            border-radius: 3px 3px 0 0;
+        }
+        .preloader.loading { animation: 2s preload-flip steps(2) infinite both; }
+        @keyframes preload-flip { 0% { transform: rotateY(0deg) rotateZ(-60deg); } 100% { transform: rotateY(360deg) rotateZ(-60deg); } }
+        .preloader .slice:nth-child(1) { transform: rotateZ(60deg) rotateY(90deg) rotateX(0); animation: 2s preload-cycle-1 linear infinite both; }
+        .preloader .slice:nth-child(2) { transform: rotateZ(120deg) rotateY(90deg) rotateX(0); animation: 2s preload-cycle-2 linear infinite both; }
+        .preloader .slice:nth-child(3) { transform: rotateZ(180deg) rotateY(90deg) rotateX(0); animation: 2s preload-cycle-3 linear infinite both; }
+        .preloader .slice:nth-child(4) { transform: rotateZ(240deg) rotateY(90deg) rotateX(0); animation: 2s preload-cycle-4 linear infinite both; }
+        .preloader .slice:nth-child(5) { transform: rotateZ(300deg) rotateY(90deg) rotateX(0); animation: 2s preload-cycle-5 linear infinite both; }
+        .preloader .slice:nth-child(6) { transform: rotateZ(360deg) rotateY(90deg) rotateX(0); animation: 2s preload-cycle-6 linear infinite both; }
+        
+        @keyframes preload-cycle-1 { 5% { transform: rotateZ(60deg) rotateY(90deg) rotateX(0deg); border-left-color: var(--loader-side); } 10%, 75% { transform: rotateZ(60deg) rotateY(0) rotateX(0deg); border-left-color: var(--loader-face); } 80%, 100% { transform: rotateZ(60deg) rotateY(90deg) rotateX(0deg); border-left-color: var(--loader-side); } }
+        @keyframes preload-cycle-2 { 10% { transform: rotateZ(120deg) rotateY(90deg) rotateX(0deg); border-left-color: var(--loader-side); } 15%, 70% { transform: rotateZ(120deg) rotateY(0) rotateX(0deg); border-left-color: var(--loader-face); } 75%, 100% { transform: rotateZ(120deg) rotateY(90deg) rotateX(0deg); border-left-color: var(--loader-side); } }
+        @keyframes preload-cycle-3 { 15% { transform: rotateZ(180deg) rotateY(90deg) rotateX(0deg); border-left-color: var(--loader-side); } 20%, 65% { transform: rotateZ(180deg) rotateY(0) rotateX(0deg); border-left-color: var(--loader-face); } 70%, 100% { transform: rotateZ(180deg) rotateY(90deg) rotateX(0deg); border-left-color: var(--loader-side); } }
+        @keyframes preload-cycle-4 { 20% { transform: rotateZ(240deg) rotateY(90deg) rotateX(0deg); border-left-color: var(--loader-side); } 25%, 60% { transform: rotateZ(240deg) rotateY(0) rotateX(0deg); border-left-color: var(--loader-face); } 65%, 100% { transform: rotateZ(240deg) rotateY(90deg) rotateX(0deg); border-left-color: var(--loader-side); } }
+        @keyframes preload-cycle-5 { 25% { transform: rotateZ(300deg) rotateY(90deg) rotateX(0deg); border-left-color: var(--loader-side); } 30%, 55% { transform: rotateZ(300deg) rotateY(0) rotateX(0deg); border-left-color: var(--loader-face); } 60%, 100% { transform: rotateZ(300deg) rotateY(90deg) rotateX(0deg); border-left-color: var(--loader-side); } }
+        @keyframes preload-cycle-6 { 30% { transform: rotateZ(360deg) rotateY(90deg) rotateX(0deg); border-left-color: var(--loader-side); } 35%, 50% { transform: rotateZ(360deg) rotateY(0) rotateX(0deg); border-left-color: var(--loader-face); } 55%, 100% { transform: rotateZ(360deg) rotateY(90deg) rotateX(0deg); border-left-color: var(--loader-side); } }
+
+        /* --- MAIN SITE STYLES --- */
+        section { position: relative; height: 100svh; width: 100%; background-color: var(--c-bg); overflow: hidden; }
+        section.section2 { height: min-content; background-color: var(--c-bg); }
+        .loop-images { display: flex; align-items: center; justify-content: center; flex-direction: column; }
+        .carousel-track { --w: 30rem; --total: 12; --left: calc(var(--w) * -1); width: 100%; height: 30rem; position: relative; }
+        
+        .carousel-track .carousel-item {
+            position: absolute;
+            width: var(--w);
+            height: var(--w);
+            left: calc(var(--w) * (var(--total) - 1));
+            display: flex;
+            justify-content: center;
+            perspective: 1000px;
+            transform-style: preserve-3d;
+            animation: scroll-left var(--time) linear infinite;
+            animation-delay: calc(var(--time) / var(--total) * (var(--i) - 1) - var(--time));
+            will-change: left;
+            transition: 0.5s ease-in-out;
+            z-index: 1;
+        }
+        
+        /* Add hover-target logic to images */
+        .carousel-track .carousel-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background-color: var(--c-bg);
+            transform: rotateY(-45deg);
+            transition: 0.5s ease-in-out;
+            mask: linear-gradient(to bottom, rgba(0,0,0,1) 70%, transparent 100%);
+            -webkit-mask: linear-gradient(to bottom, rgba(0,0,0,1) 70%, transparent 100%);
+        }
+        
+        .carousel-track .carousel-item:hover img { transform: rotateY(0deg) translateY(-1rem); z-index: 10; }
+        @keyframes scroll-left { to { left: var(--left); } }
+        
+        .scroll-down {
+            position: absolute; bottom: 5rem; left: 0; right: 0; text-align: center;
+            font-size: 1.6rem; color: var(--c-content); display: flex; flex-direction: column;
+            align-items: center; text-decoration: none; opacity: 0.7; z-index: 5;
+        }
+        .image-motion { width: 100%; height: 100%; border-radius: inherit; object-position: center; transform: rotateX(90deg); transform-origin: 50% 0; }
+        .image-motion picture { display: block; width: 100%; height: 100%; }
+        .image-motion picture img { width: 100%; height: 100%; object-fit: cover; }
+        
+        .section3 { display: flex; justify-content: center; align-items: center; color: var(--c-content); padding: 6rem 2rem; min-height: 100vh; background: var(--c-bg); overflow: hidden; }
+        .section3 .container { width: 100%; max-width: 1200px; margin: auto; text-align: center; position: relative; z-index: 2; }
+        .section3 .title { font-size: 5rem; font-weight: 800; margin-bottom: 2.5rem; background: linear-gradient(135deg, var(--c-action) 0%, var(--c-content) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: 1.1; letter-spacing: -2px; position: relative; }
+        .section3 .subtitle { font-size: 1.6rem; font-weight: 300; color: color-mix(in srgb, var(--c-content), transparent 30%); margin-bottom: 2rem; letter-spacing: 3px; text-transform: uppercase; }
+        .section3 .text-content .text { font-size: 1.3rem; font-weight: 400; color: var(--c-content); line-height: 1.9; margin-bottom: 2.5rem; max-width: 700px; margin-inline: auto; }
+        .section3 .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2.5rem; margin-top: 5rem; }
+        .section3 .feature { background: color-mix(in srgb, var(--c-glass) 10%, transparent); backdrop-filter: blur(10px); border: 1px solid color-mix(in srgb, var(--c-content) 20%, transparent); border-radius: var(--border-radius); padding: 3.5rem 2.5rem; text-align: center; transition: all 0.4s ease; }
+        .section3 .feature:hover { transform: translateY(-15px); border-color: var(--c-action); }
+        .section3 .feature h3 { font-size: 1.8rem; font-weight: 700; color: var(--c-content); margin-bottom: 1.5rem; }
+        .section3 .feature p { font-size: 1.1rem; font-weight: 300; color: color-mix(in srgb, var(--c-content), transparent 40%); line-height: 1.7; }
+        @media (max-width: 768px) { .section3 { padding: 4rem 1rem; margin-top: -2px; } .section3 .title { font-size: 3.5rem; } .section3 .features { grid-template-columns: 1fr; } }
+
+        /* --- MOBILE SPECIFIC FIX FOR HEADER --- */
+        @media (max-width: 768px) {
+            .cd-header {
+                padding: 20px 20px; /* Keep standard padding */
+            }
+            .header-wrapper {
+                /* Reset width calculation and margin used for desktop */
+                width: 100%;
+                margin-left: 0;
+            }
+            .logo-wrap {
+                /* Ensure it sticks to the left of the container */
+                left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class='cursor' id="cursor"></div>
+    <div class='cursor2' id="cursor2"></div>
+    <div class='cursor3' id="cursor3"></div>
+
+    <header class="cd-header">
+        <div class="header-wrapper">
+            <div class="logo-wrap">
+                <a href="#" class="hover-target"><span>chlah</span>chlah</a>
+            </div>
+            <div class="nav-but-wrap">
+                <div class="menu-icon hover-target">
+                    <span class="menu-icon__line menu-icon__line-left"></span>
+                    <span class="menu-icon__line"></span>
+                    <span class="menu-icon__line menu-icon__line-right"></span>
+                </div>                  
+            </div>                  
+        </div>              
+    </header>
+
+    <div class="nav">
+        <div class="nav__content">
+            <ul class="nav__list">
+                <li class="nav__list-item active-nav"><a href="#" class="hover-target">home</a></li>
+                <li class="nav__list-item"><a href="#" class="hover-target">studio</a></li>
+                <li class="nav__list-item"><a href="#" class="hover-target">news</a></li>
+                <li class="nav__list-item"><a href="#" class="hover-target">contact</a></li>
+            </ul>
+        </div>
+    </div>  
+
+    <div id="preloader-overlay">
+        <div class="preloader loading">
+            <span class="slice"></span>
+            <span class="slice"></span>
+            <span class="slice"></span>
+            <span class="slice"></span>
+            <span class="slice"></span>
+            <span class="slice"></span>
+        </div>
+    </div>
+
+    <section class="loop-images">
+        <div class="carousel-track" style="--time: 60s;">
+            <div class="carousel-item hover-target" style="--i: 1;"><img src="https://placehold.co/600x600/EEE/31343C?text=Image+1" alt="Product 1"></div>
+            <div class="carousel-item hover-target" style="--i: 2;"><img src="https://placehold.co/600x600/EEE/31343C?text=Image+2" alt="Product 2"></div>
+            <div class="carousel-item hover-target" style="--i: 3;"><img src="https://placehold.co/600x600/EEE/31343C?text=Image+3" alt="Product 3"></div>
+            <div class="carousel-item hover-target" style="--i: 4;"><img src="https://placehold.co/600x600/EEE/31343C?text=Image+4" alt="Product 4"></div>
+            <div class="carousel-item hover-target" style="--i: 5;"><img src="https://placehold.co/600x600/EEE/31343C?text=Image+5" alt="Product 5"></div>
+            <div class="carousel-item hover-target" style="--i: 6;"><img src="https://placehold.co/600x600/EEE/31343C?text=Image+6" alt="Product 6"></div>
+            <div class="carousel-item hover-target" style="--i: 7;"><img src="https://placehold.co/600x600/EEE/31343C?text=Image+7" alt="Product 7"></div>
+            <div class="carousel-item hover-target" style="--i: 8;"><img src="https://placehold.co/600x600/EEE/31343C?text=Image+8" alt="Product 8"></div>
+            <div class="carousel-item hover-target" style="--i: 9;"><img src="https://placehold.co/600x600/EEE/31343C?text=Image+9" alt="Product 9"></div>
+            <div class="carousel-item hover-target" style="--i: 10;"><img src="https://placehold.co/600x600/EEE/31343C?text=Image+10" alt="Product 10"></div>
+            <div class="carousel-item hover-target" style="--i: 11;"><img src="https://placehold.co/600x600/EEE/31343C?text=Image+11" alt="Product 11"></div>
+            <div class="carousel-item hover-target" style="--i: 12;"><img src="https://placehold.co/600x600/EEE/31343C?text=Image+12" alt="Product 12"></div>
+        </div>
+        <span class="scroll-down">Scroll down <span class="arrow">↓</span></span>
+    </section>
+
+    <section class="section2">
+        <div class="image-motion">
+            <picture>
+                <img src="https://i.postimg.cc/1ztkf4hX/moveimage.png" alt="Transition Image">
+            </picture>
+        </div>
+    </section>
+
+    <section class="section3">
+        <div class="container">
+            <h1 class="title">YOUR MAIN TITLE</h1>
+            <p class="subtitle">Your Subtitle Here</p>
+            <div class="text-content">
+                <p class="text">Write your first paragraph here. This text will split and animate when you scroll into view.</p>
+                <p class="text">Write your second paragraph here regarding your product, service, or portfolio details.</p>
+                <p class="text">Final concluding paragraph describing the project or offer.</p>
+            </div>
+            <div class="features">
+                <div class="feature hover-target">
+                    <h3>Feature One</h3>
+                    <p>Description of feature one goes here.</p>
+                </div>
+                <div class="feature hover-target">
+                    <h3>Feature Two</h3>
+                    <p>Description of feature two goes here.</p>
+                </div>
+                <div class="feature hover-target">
+                    <h3>Feature Three</h3>
+                    <p>Description of feature three goes here.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        window.addEventListener("load", () => {
+            setTimeout(() => {
+                document.body.classList.add("loaded");
+                initAnimations();
+            }, 1000);
+        });
+
+        function initAnimations() {
+            // 1. GSAP Scroll Logic
+            gsap.registerPlugin(ScrollTrigger);
+            const lenis = new Lenis();
+            lenis.on('scroll', ScrollTrigger.update);
+            gsap.ticker.add((time) => { lenis.raf(time * 1000); });
+            gsap.ticker.lagSmoothing(0);
+
+            gsap.set('.image-motion', { transform: 'rotateX(90deg)' });
+            gsap.to('.image-motion', {
+                transform: 'rotateX(0deg)',
+                scrollTrigger: { trigger: '.section2', start: 'top bottom', end: 'bottom top', scrub: true, markers: false },
+            });
+
+            gsap.fromTo('.title', { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 1, ease: 'power3.out', scrollTrigger: { trigger: '.section3', start: 'top 80%', end: 'bottom 20%', toggleActions: 'play none none reverse' } });
+            gsap.fromTo('.subtitle', { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8, delay: 0.3, ease: 'power3.out', scrollTrigger: { trigger: '.section3', start: 'top 80%', end: 'bottom 20%', toggleActions: 'play none none reverse' } });
+
+            if (typeof SplitText !== 'undefined') {
+                const text = new SplitText('.text', { types: 'lines', mask: 'lines' });
+                gsap.fromTo(text.lines, { opacity: 0, y: 30 }, { opacity: 1, y: 0, stagger: 0.2, duration: 0.8, ease: 'power3.out', scrollTrigger: { trigger: '.text-content', start: 'top 80%', end: 'bottom 20%', toggleActions: 'play none none reverse' } });
+            } else {
+                gsap.fromTo('.text', { opacity: 0, y: 30 }, { opacity: 1, y: 0, stagger: 0.2, duration: 0.8, ease: 'power3.out', scrollTrigger: { trigger: '.text-content', start: 'top 80%', end: 'bottom 20%', toggleActions: 'play none none reverse' } });
+            }
+
+            gsap.fromTo('.feature', { opacity: 0, y: 50, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, stagger: 0.2, duration: 0.8, ease: 'power3.out', scrollTrigger: { trigger: '.features', start: 'top 80%', end: 'bottom 20%', toggleActions: 'play none none reverse' } });
+
+            // 2. MOUSE POINTER LOGIC (Converted to Vanilla JS)
+            const t = document.getElementById("cursor"),
+                  e = document.getElementById("cursor2"),
+                  i = document.getElementById("cursor3");
+
+            document.body.addEventListener("mousemove", function(n) {
+                t.style.left = n.clientX + "px";
+                t.style.top = n.clientY + "px";
+                e.style.left = n.clientX + "px";
+                e.style.top = n.clientY + "px";
+                i.style.left = n.clientX + "px";
+                i.style.top = n.clientY + "px";
+            });
+
+            function addHover() {
+                e.classList.add("hover");
+                i.classList.add("hover");
+            }
+            function removeHover() {
+                e.classList.remove("hover");
+                i.classList.remove("hover");
+            }
+
+            // Attach hover listeners to anything with class .hover-target
+            const hoverTargets = document.querySelectorAll(".hover-target");
+            hoverTargets.forEach(target => {
+                target.addEventListener("mouseover", addHover);
+                target.addEventListener("mouseout", removeHover);
+            });
+
+            // 3. MENU TOGGLE LOGIC (Converted to Vanilla JS)
+            const body = document.querySelector('body');
+            const menuIcon = document.querySelector('.menu-icon');
+            
+            if(menuIcon) {
+                menuIcon.addEventListener('click', function () {
+                    body.classList.toggle('nav-active');
+                });
+            }
+        }
+    </script>
+</body>
+</html>
